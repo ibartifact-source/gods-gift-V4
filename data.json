@@ -2,22 +2,23 @@
   {
     "name": { "zh": "台灣", "en": "Taiwan", "jp": "台湾" },
     "release": 1000,
-    "remaining": 950
+    "remaining": 1000
   },
   {
     "name": { "zh": "日本", "en": "Japan", "jp": "日本" },
-    "release": 5000,
-    "remaining": 4999
+    "release": 5300,
+    "remaining": 5300
   },
   {
     "name": { "zh": "美國", "en": "USA", "jp": "USA" },
-    "release": 8000,
-    "remaining": 8000
+    "release": 14000,
+    "remaining": 14000
   },
   {
     "name": { "zh": "韓國", "en": "Korea", "jp": "韓国" },
-    "release": 3000,
-    "remaining": 3000
+    "release": 2200,
+    "remaining": 2200
   }
 
 ]
+
