@@ -81,7 +81,7 @@
         const i18n = {
             zh: { name: '繁體中文', title: '神的禮物', subtitle: '客製化機能飲料', start: '即將啟航', status: '覺醒 進化', tag: '獲取永續分散進步', hero: '極致核心能量', hero_desc: '透過精準的肽鏈技術，將大自然的神奇贈禮轉化為支撐夢想的純淨動能。', explore_title: '探索領域', region: '切換點選', release: '釋放名額', remaining: '剩餘名額', stats_title: '各國終身半價名額最新統計', quote: '「 每一場偉大，都始於一次次的覺醒進化。」', copyrightText: '神的禮物 版權所有' },
             en: { name: 'English', title: "God's Gift", subtitle: 'Customized Functional Drink', start: 'Launch Now', status: 'Awaken Evolution', tag: 'Sustained Progress', hero: 'Ultimate Core Energy', hero_desc: 'Transform nature\'s divine gifts into pure kinetic energy through precise peptide technology.', explore_title: 'Explore Realms', region: 'Switch Click', release: 'Release quota', remaining: 'Remaining', stats_title: 'Global Half-Price Quota Statistics', quote: '“Every greatness begins with continuous awakening and evolution.”', copyrightText: "God's Gift ALL RIGHTS RESERVED" },
-            jp: { name: '日本語', title: '神の贈り物', subtitle: 'カスタマイズ機能性飲料', start: '航海を開始', status: '覚醒 進化', tag: '持続的な分散進化', hero: '究極のコア能量', hero_desc: '精密なペプチド技術を通じて、大自然の神秘を夢を支える純粋なエネルギーに変換します。', explore_title: '探索領域', region: 'クリック切替', release: '放出枠', remaining: '残り枠', stats_title: '各国終身半額枠の最新統計', quote: '「すべての偉大さは、度重なる覚醒と進化から始まる。」', copyrightText: '神の贈り物 全著作權所有' }
+            jp: { name: '日本語', title: '神の贈り物', subtitle: 'カスタマイズ機能性飲料', start: '航海を開始', status: '覚醒 進化', tag: '持続的な分散進化', hero: '究極のコア能量', hero_desc: '精密なペプチド技術を通じて、大自然の神秘を夢を支える純粋な能量に変換します。', explore_title: '探索領域', region: 'クリック切替', release: '放出枠', remaining: '残り枠', stats_title: '各国終身半額枠の最新統計', quote: '「すべての偉大さは、度重なる覚醒と進化から始まる。」', copyrightText: '神の贈り物 全著作權所有' }
         };
 
         const cards_i18n = {
@@ -121,7 +121,7 @@
             ],
             jp: [
                 { title: "カスタム飲料", code: "CF-001", color: "#00f0ff", rgb: "0, 240, 255", subtitle: "飲料をカスタムしますか？", desc: "調合シミュレーションを體驗：\n📌 成分を選択・入力\n📄 最終的なカロリーを表示", btn: "開始する▶️", url: "https://timely-duckanoo-ee35d4.netlify.app/" },
-                { title: "神のセット", code: "GM-002", color: "#d4af37", rgb: "212, 175, 55", subtitle: "現在のセットプラン", desc: "新的食事モードを開始。ランチから始めてミッションをクリアし、健康な生活を築きましょう。", btn: "開始する！👉", url: "https://ibartifact-source.github.io/gods-meal/" },
+                { title: "神のセット", code: "GM-002", color: "#d4af37", rgb: "212, 175, 55", subtitle: "現在のセットプラン", desc: "新しい食事モードを開始。ランチから始めてミッションをクリアし、健康な生活を築きましょう。", btn: "開始する！👉", url: "https://ibartifact-source.github.io/gods-meal/" },
                 { title: "終身半額枠", code: "LF-003", color: "#ff00ff", rgb: "255, 0, 255", subtitle: "終身半額資格の取得", desc: "枠數限定：\n📌 毎月の配送箱數を選択\n👨 6ヶ月継続で資格獲得", btn: "詳細を見る", url: "https://lighthearted-pegasus-4c316a.netlify.app/" },
                 { title: "サービス時間", code: "SH-004", color: "#00ff9f", rgb: "0, 255, 159", subtitle: "（月〜金）", desc: "時間帯：\n🔔 9:00-10:00：オンライン注文\n👨 15:00-17:00：對人サポート", btn: "24H AIアシスト", url: "https://chatbot-vuyupo7x.manus.space/" },
                 { title: "よくある質問", code: "QA-005", color: "#ffff00", rgb: "255, 255, 0", subtitle: "プロジェクトを深く知る", desc: "リソースセンターにガイドを用意しました。", btn: "質問を見る", url: "https://faqweb-hq8a4kf5.manus.space/" },
@@ -151,13 +151,13 @@
 
             useEffect(() => { 
                 setIsLoaded(true);
-                // 讀取外部 JSON
+                // --- 數據讀取邏輯 ---
                 fetch('./data.json')
                     .then(res => res.json())
                     .then(data => setGlobalStats(data))
                     .catch(e => {
-                        console.error("JSON 讀取失敗，使用備援數據", e);
-                        setGlobalStats([{ name: { zh: "資料加載中", en: "Loading", jp: "読み込み中" }, release: 0, remaining: 0 }]);
+                        console.error("JSON 讀取失敗", e);
+                        setGlobalStats([{ name: { zh: "資料讀取中", en: "Loading", jp: "読み込み中" }, release: 0, remaining: 0 }]);
                     });
             }, [page]);
 
