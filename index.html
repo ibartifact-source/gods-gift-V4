@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神的禮物 - 客製化機能飲料</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Share+Tech+Mono&family=Inter:wght@900&family=Orbitron:wght@900&display=swap');
+        
+        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
+        body { margin: 0; padding: 0; background-color: #0d0d08; overflow-x: hidden; }
+
+        /* --- 呼吸感特效 CSS --- */
+        .breathing-text-container {
+            display: inline-block;
+            position: relative;
+            will-change: transform;
+        }
+
+        .breathing-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.2em;
+            position: relative;
+            z-index: 1;
+            animation: deep-breath-system 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+            font-style: italic;
+            text-transform: uppercase;
+        }
+
+        .breathing-text::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            color: #fff;
+            z-index: -1;
+            filter: blur(12px);
+            animation: glow-fade-system 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+
+        @keyframes deep-breath-system {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes glow-fade-system {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* --- 流光閃耀特效 CSS --- */
+        .shiny-text { 
+            background: linear-gradient(to right, #d4af37 20%, #fff 40%, #fff 60%, #d4af37 80%); 
+            background-size: 200% auto; 
+            color: #d4af37; 
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: shine 4s linear infinite; 
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* 背景與卡片樣式 */
+        .magazine-bg-text {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(15deg); 
+            width: 100vw; text-align: center; font-size: 30vw; font-weight: 900; color: #0d0d08;
+            text-shadow: -2px -2px 1px rgba(212, 175, 55, 0.15), 1px 1px 1px rgba(0, 0, 0, 0.8), 4px 4px 8px rgba(0, 0, 0, 1), 8px 8px 16px rgba(0, 0, 0, 0.9);
+            pointer-events: none; z-index: 0; white-space: nowrap; letter-spacing: -0.05em; text-transform: uppercase; font-family: 'Inter', sans-serif; opacity: 0.95; filter: contrast(1.2);
+        }
+
+        .cyber-card {
+            position: relative; background: rgba(20, 20, 15, 0.95); border: 2px solid rgba(var(--neon-rgb), 0.6);
+            box-shadow: 0 0 15px rgba(var(--neon-rgb), 0.3); clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; overflow: hidden; animation: card-glow-pulse 3s infinite ease-in-out;
+        }
+        @keyframes card-glow-pulse { 0%, 100% { box-shadow: 0 0 12px rgba(var(--neon-rgb), 0.2); border-color: rgba(var(--neon-rgb), 0.5); } 50% { box-shadow: 0 0 25px rgba(var(--neon-rgb), 0.6); border-color: rgba(var(--neon-rgb), 1); } }
+        .cyber-card:hover { transform: scale(1.02); border-color: var(--neon-color); box-shadow: 0 0 40px rgba(var(--neon-rgb), 0.8); background: rgba(25, 25, 20, 1); }
+        
+        .status-light { width: 8px; height: 8px; border-radius: 50%; background-color: var(--neon-color); box-shadow: 0 0 12px var(--neon-color); animation: neon-pulse 1.5s infinite ease-in-out; }
+        @keyframes neon-pulse { 0%, 100% { opacity: 0.3; filter: brightness(1); } 50% { opacity: 1; filter: brightness(2) drop-shadow(0 0 8px var(--neon-color)); } }
+
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-slow-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        .animate-spin-slow { animation: spin-slow 15s linear infinite; }
+        .animate-spin-slow-reverse { animation: spin-slow-reverse 10s linear infinite; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        .scan-line { width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #d4af37, transparent); position: absolute; top: 0; left: 0; animation: scan 4s linear infinite; opacity: 0.3; }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .grid-bg { background-image: radial-gradient(#d4af37 1px, transparent 1px); background-size: 30px 30px; opacity: 0.05; }
+        .cyber-border { clip-path: polygon(0 0, 95% 0, 100% 15%, 100% 100%, 5% 100%, 0 85%); }
+        .grain { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.05; pointer-events: none; }
+
+        .sync-tag-box {
+            position: relative; padding: 6px 18px; background: rgba(0, 212, 255, 0.05); border: 1px solid #00d4ff;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 90% 100%, 0 100%); animation: cyber-flow 3s infinite alternate ease-in-out;
+        }
+        @keyframes cyber-flow { 0% { border-color: #00d4ff; box-shadow: 0 0 5px rgba(0, 212, 255, 0.3); } 100% { border-color: #0055ff; box-shadow: 0 0 15px rgba(0, 85, 255, 0.5); } }
+        .sync-tag-label { font-size: 18px; color: #00d4ff; letter-spacing: 0.4em; font-weight: 900; text-transform: uppercase; text-shadow: 0 0 8px rgba(0, 212, 255, 0.8); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const RollingNumber = ({ value }) => {
+            const [displayValue, setDisplayValue] = useState(0);
+            useEffect(() => {
+                let start = 0; const duration = 1000;
+                const increment = Math.ceil(value / (duration / 16)) || 1;
+                const timer = setInterval(() => {
+                    start += increment;
+                    if (start >= value) { setDisplayValue(value); clearInterval(timer); } 
+                    else { setDisplayValue(start); }
+                }, 16);
+                return () => clearInterval(timer);
+            }, [value]);
+            return <span>{displayValue.toLocaleString()}</span>;
+        };
+
+        const IconCpu = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>;
+        const IconChevronRight = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>;
+        const IconSettings = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+        const IconZap = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+        const IconGlobe = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+
+        const i18n = {
+            zh: { 
+                name: '繁體中文', title: '神的禮物', subtitle: '客製化機能飲料', start: '即將啟航', status: '覺醒 進化', tag: '獲取永續分散進步', hero: '極致核心能量', hero_desc: '透過精準的肽鏈技術，將大自然的神奇贈禮轉化為支撐夢想的純淨動能。', explore_title: '探索領域', region: '切換點選', release: '釋放名額', remaining: '剩餘名額', stats_title: '各國終身半價名額最新統計',
+                quote: '「 每一場偉大，都始於一次次的覺醒進化。」', copyrightText: '神的禮物 版權所有'
+            },
+            en: { 
+                name: 'English', title: "God's Gift", subtitle: 'Customized Functional Drink', start: 'Launch Now', status: 'Awaken Evolution', tag: 'Sustained Progress', hero: 'Ultimate Core Energy', hero_desc: 'Transform nature\'s divine gifts into pure kinetic energy through precise peptide technology.', explore_title: 'Explore Realms', region: 'Switch Click', release: 'Release quota', remaining: 'Remaining', stats_title: 'Global Half-Price Quota Statistics',
+                quote: '“Every greatness begins with continuous awakening and evolution.”', copyrightText: "God's Gift ALL RIGHTS RESERVED"
+            },
+            jp: { 
+                name: '日本語', title: '神の贈り物', subtitle: 'カスタマイズ機能性飲料', start: '航海を開始', status: '覚醒 進化', tag: '持続的な分散進化', hero: '究極のコア能量', hero_desc: '精密なペプチド技術を通じて、大自然の神秘を夢を支える純粋なエネルギーに変換します。', explore_title: '探索領域', region: 'クリック切替', release: '放出枠', remaining: '残り枠', stats_title: '各国終身半額枠の最新統計',
+                quote: '「すべての偉大さは、度重なる覚醒と進化から始まる。」', copyrightText: '神の贈り物 全著作權所有'
+            }
+        };
+
+        const GLOBAL_STATS = [ 
+            { name: { zh: '台灣', en: 'Taiwan', jp: '台湾' }, release: 500, remaining: 42 }, 
+            { name: { zh: '日本', en: 'Japan', jp: '日本' }, release: 800, remaining: 126 }, 
+            { name: { zh: '美國', en: 'USA', jp: 'USA' }, release: 1200, remaining: 345 }, 
+            { name: { zh: '韓國', en: 'Korea', jp: '韓国' }, release: 600, remaining: 0 } 
+        ];
+
+        const cards_i18n = {
+            zh: [
+                { title: "內在修煉", subtitle: "修煉心魔與身體平衡", desc: "透過聰明補給與修煉，學習觀照自己、修煉心魔，讓身與心都達到平衡的狀態。" },
+                { title: "健康起點", subtitle: "打造屬於你的健康生活", desc: "從每日飲食與規律運動開始，讓你的身體重新找回自然的節奏與能量。" },
+                { title: "探索與超越", subtitle: "突破自我的無限可能", desc: "在修煉的過程中，不斷挑戰自己，超越過去的限制，發現生命中更多的可能性。" }
+            ],
+            jp: [
+                { title: "内なる修行", subtitle: "心の魔と身体のバランス", desc: "賢い補給と修行を通じて、自己を観察し、心の魔を抑え、心身ともにバランスの取れた状態を目指します。" },
+                { title: "健康の起点", subtitle: "あなただけの健康生活を構築", desc: "毎日の食事と規則正しい運動から始め、身體本來のリズムと能量を取り戻しましょう。" },
+                { title: "探索と超越", subtitle: "自己の無限の可能性を突破", desc: "修行の過程で絕えず自分に挑戦し、過去の制限を超え、人生のさらなる可能性を発見します。" }
+            ],
+            en: [
+                { title: "Inner Mastery", subtitle: "Training the Mind and Body", desc: "Balance your mind and body through smart supplements and self-reflection to reach harmony." },
+                { title: "Healthy Start", subtitle: "Craft Your Ideal Lifestyle", desc: "Reconnect with your natural energy through balanced daily nutrition and consistent exercise." },
+                { title: "Explore & Beyond", subtitle: "Breaking Infinite Possibilities", desc: "Continuously challenge yourself in your training to transcend limits and discover new horizons." }
+            ]
+        };
+
+        const explore_i18n = {
+            zh: [
+                { title: "客製化飲料", code: "CF-001", color: "#00f0ff", rgb: "0, 240, 255", subtitle: "想要客製化你的機能飲料嗎？", desc: "你可以先手動試試體驗整個飲料調配遊戲流程：\n📌 先依序選擇與填入你所需的成分含量\n📄 最後就會出現你配方的卡路里", btn: "開始吧▶️", url: "https://timely-duckanoo-ee35d4.netlify.app/" },
+                { title: "神的套餐", code: "GM-002", color: "#d4af37", rgb: "212, 175, 55", subtitle: "查看目前我們的套餐組合", desc: "現在您可以開始享受不一樣的飲食新模式了，讓咱們先從中餐開始，並且透過完成任務領取獲勵，來建立整套全方位健康新生活。", btn: "開始吧！👉", url: "https://ibartifact-source.github.io/gods-meal/" },
+                { title: "終身半價粉絲資格", code: "LF-003", color: "#ff00ff", rgb: "255, 0, 255", subtitle: "想要獲得終身半價粉絲資格嗎？", desc: "資格數量有限，取得容易：\n📌 先選取自己每月想配送的箱數\n👨 連續六個月不中斷即可獲得", btn: "了解詳情", url: "https://lighthearted-pegasus-4c316a.netlify.app/" },
+                { title: "我們的服務時間", code: "SH-004", color: "#00ff9f", rgb: "0, 255, 159", subtitle: "（週一至週五）", desc: "服務時段：\n🔔 早上 9:00-10:00：線上訂餐時間\n👨 下午 3:00-5:00：真人客服諮詢時段", btn: "智能客服24H", url: "https://chatbot-vuyupo7x.manus.space/" },
+                { title: "常見問與答", code: "QA-005", color: "#ffff00", rgb: "255, 255, 0", subtitle: "深入了解榮耀覺醒計畫", desc: "有些問題不是三言兩語就能解開\n我們在資源下載天堂網站裡也準備了指引", btn: "查看問答", url: "https://faqweb-hq8a4kf5.manus.space/" },
+                { title: "永續分散進步修煉", code: "SP-006", color: "#ff8c00", rgb: "255, 140, 0", subtitle: "修煉出自己的完美", desc: "搭配的心法或習慣包括：能量燈號、必然順便，可幫助您快速完成天堂日誌，獲得善魔力。", btn: "❤️開始修練", url: "https://cerulean-chebakia-96c566.netlify.app/" }
+            ],
+            en: [
+                { title: "Custom Drink", code: "CF-001", color: "#00f0ff", rgb: "0, 240, 255", subtitle: "Want to customize your drink?", desc: "Try our drink mixing simulation:\n📌 Select your ingredients\n📄 Calculate total calories instantly", btn: "Start Now▶️", url: "https://timely-duckanoo-ee35d4.netlify.app/" },
+                { title: "God's Meal", code: "GM-002", color: "#d4af37", rgb: "212, 175, 55", subtitle: "Browse current meal combos", desc: "Experience a new mode of nutrition. Start with lunch and earn rewards for completing health tasks.", btn: "Let's Go!👉", url: "https://ibartifact-source.github.io/gods-meal/" },
+                { title: "Half-Price VIP", code: "LF-003", color: "#ff00ff", rgb: "255, 0, 255", subtitle: "Lifetime half-price status", desc: "Limited spots available:\n📌 Choose monthly delivery quantity\n👨 Stay for 6 months to qualify", btn: "Learn More", url: "https://lighthearted-pegasus-4c316a.netlify.app/" },
+                { title: "Service Hours", code: "SH-004", color: "#00ff9f", rgb: "0, 255, 159", subtitle: "(Mon - Fri)", desc: "Schedule:\n🔔 9:00-10:00: Online ordering\n👨 15:00-17:00: Live support", btn: "AI Assistant 24H", url: "https://chatbot-vuyupo7x.manus.space/" },
+                { title: "FAQ", code: "QA-005", color: "#ffff00", rgb: "255, 255, 0", subtitle: "Awakening Plan Details", desc: "Complex questions explained simply in our Paradise Resource Center guide.", btn: "View FAQ", url: "https://faqweb-hq8a4kf5.manus.space/" },
+                { title: "Sustainable Training", code: "SP-006", color: "#ff8c00", rgb: "255, 140, 0", subtitle: "Refine Your Perfection", desc: "Habits like Energy Signals and Inevitable Progress help you earn magical power logs.", btn: "❤️Start Training", url: "https://cerulean-chebakia-96c566.netlify.app/" }
+            ],
+            jp: [
+                { title: "カスタム飲料", code: "CF-001", color: "#00f0ff", rgb: "0, 240, 255", subtitle: "飲料をカスタムしますか？", desc: "調合シミュレーションを體驗：\n📌 成分を選択・入力\n📄 最終的なカロリーを表示", btn: "開始する▶️", url: "https://timely-duckanoo-ee35d4.netlify.app/" },
+                { title: "神のセット", code: "GM-002", color: "#d4af37", rgb: "212, 175, 55", subtitle: "現在のセットプラン", desc: "新しい食事モードを開始。ランチから始めてミッションをクリアし、健康な生活を築きましょう。", btn: "開始する！👉", url: "https://ibartifact-source.github.io/gods-meal/" },
+                { title: "終身半額枠", code: "LF-003", color: "#ff00ff", rgb: "255, 0, 255", subtitle: "終身半額資格の取得", desc: "枠數限定：\n📌 毎月の配送箱數を選択\n👨 6ヶ月継続で資格獲得", btn: "詳細を見る", url: "https://lighthearted-pegasus-4c316a.netlify.app/" },
+                { title: "サービス時間", code: "SH-004", color: "#00ff9f", rgb: "0, 255, 159", subtitle: "（月〜金）", desc: "時間帯：\n🔔 9:00-10:00：オンライン注文\n👨 15:00-17:00：對人サポート", btn: "24H AIアシスト", url: "https://chatbot-vuyupo7x.manus.space/" },
+                { title: "よくある質問", code: "QA-005", color: "#ffff00", rgb: "255, 255, 0", subtitle: "プロジェクトを深く知る", desc: "リソースセンターにガイドを用意しました。", btn: "質問を見る", url: "https://faqweb-hq8a4kf5.manus.space/" },
+                { title: "持続的な修行", code: "SP-006", color: "#ff8c00", rgb: "255, 140, 0", subtitle: "完璧を練り上げる", desc: "エネルギー信号、必然的習慣などの手法。ログを完了し、善の魔力を獲得しましょう。", btn: "❤️修行開始", url: "https://cerulean-chebakia-96c566.netlify.app/" }
+            ]
+        };
+
+        const AdvertisementWall = () => {
+            const videoRef = useRef(null);
+            useEffect(() => { if (videoRef.current) videoRef.current.play().catch(e => {}); }, []);
+            return (
+                <div className="relative w-full h-full overflow-hidden bg-black flex flex-col group transition-all duration-700">
+                    <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover opacity-80 z-10" src="video.mp4" autoPlay loop muted playsInline />
+                    <div className="absolute inset-0 z-0"><div className="w-full h-full bg-[#d4af37]/5 mix-blend-color-dodge"></div></div>
+                    <div className="grain absolute inset-0 z-20"></div>
+                    <div className="scan-line z-30"></div>
+                    <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-[#d4af37]/40 z-40"></div>
+                    <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-[#d4af37]/40 z-40"></div>
+                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-[#d4af37]/40 z-40"></div>
+                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-[#d4af37]/40 z-40"></div>
+                </div>
+            );
+        };
+
+        function App() {
+            const [page, setPage] = useState('gateway');
+            const [isLoaded, setIsLoaded] = useState(false);
+            const [lang, setLang] = useState('zh');
+            const [showLangMenu, setShowLangMenu] = useState(false);
+            const [regionIdx, setRegionIdx] = useState(0);
+
+            useEffect(() => { setIsLoaded(true); }, [page]);
+            const enterSystem = () => { setIsLoaded(false); setTimeout(() => setPage('system'), 800); };
+
+            const LanguageSwitcher = ({ isFloating }) => (
+                <div className={isFloating ? "fixed top-6 right-6 z-[100]" : "relative"}>
+                    <button 
+                        onClick={() => setShowLangMenu(!showLangMenu)} 
+                        className="flex items-center gap-3 px-4 py-2 border border-[#d4af37]/40 bg-black/60 backdrop-blur-md hover:bg-[#d4af37] hover:text-black transition-all"
+                    >
+                        <IconGlobe className="w-4 h-4" />
+                        <span className="text-[12px] font-bold tracking-widest uppercase">{i18n[lang].name}</span>
+                    </button>
+                    {showLangMenu && (
+                        <div className="absolute top-full right-0 mt-2 bg-black/90 border border-[#d4af37]/20 flex flex-col min-w-[120px] shadow-2xl z-[110]">
+                            {Object.keys(i18n).map(k => (
+                                <button key={k} onClick={() => { setLang(k); setShowLangMenu(false); }} className={`px-4 py-2 text-[12px] text-left hover:bg-[#d4af37]/20 ${lang === k ? 'text-[#d4af37] bg-[#d4af37]/10' : ''}`}>
+                                    {i18n[k].name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-[#0d0d08] text-[#f5d76e] relative overflow-x-hidden" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
+                    <div className="magazine-bg-text">PEPTIDE</div>
+                    <div className="fixed inset-0 grid-bg pointer-events-none z-[1]"></div>
+
+                    {page === 'gateway' && <LanguageSwitcher isFloating={true} />}
+
+                    {page === 'gateway' && (
+                        <div className={`relative z-10 flex flex-col items-center justify-start md:justify-center min-h-screen px-4 pt-12 md:pt-0 transition-all duration-[1s] ${isLoaded ? 'opacity-100' : 'opacity-0'}`} style={{ fontFamily: "'Noto Serif TC', serif" }}>
+                            <div className="relative w-full max-w-[500px] flex flex-col items-center">
+                                <div className="relative w-full flex items-center justify-center scale-[0.8] md:scale-100 mb-4 md:mb-10">
+                                    <div className="relative w-60 h-60 md:w-72 md:h-72 border border-[#d4af37]/30 bg-[#141410]/60 backdrop-blur-3xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.8)] z-10">
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <div className="relative w-36 h-36 md:w-48 md:h-48">
+                                                <div className="absolute inset-0 border-[0.5px] border-[#d4af37]/20 rotate-45 animate-spin-slow" />
+                                                <div className="absolute inset-3 border-[0.5px] border-[#d4af37]/40 -rotate-45 animate-spin-slow-reverse" />
+                                                <div className="absolute inset-6 border-2 border-[#d4af37] animate-pulse" />
+                                                <div className="absolute inset-0 flex items-center justify-center"><IconCpu className="text-[#d4af37] w-8 h-8 md:w-12 md:h-12" /></div>
+                                            </div>
+                                            <div className="mt-6 text-center px-4">
+                                                <div className="text-[12px] font-black tracking-[0.4em] mb-2 opacity-50 uppercase">Heaven Operating System</div>
+                                                <div className="flex gap-1 justify-center">
+                                                    {[...Array(12)].map((_, i) => (
+                                                        <div key={i} className="w-0.5 md:w-1 h-2 bg-[#d4af37]/30 animate-pulse" style={{ animationDelay: `${i*0.1}s` }} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="absolute w-[110%] h-[110%] border-[0.5px] border-[#d4af37]/10 rotate-[15deg] animate-spin-slow opacity-30" />
+                                </div>
+                                <div className="relative w-full flex flex-col items-center">
+                                    <div className="relative flex flex-col items-center w-64 md:w-96 mb-6">
+                                        <div className="w-full h-2 bg-[#d4af37] shadow-[0_0_20px_#d4af37] relative z-20">
+                                            <div className="absolute -left-1 -top-1 w-3 h-3 bg-[#d4af37] rotate-45"></div>
+                                            <div className="absolute -right-1 -top-1 w-3 h-3 bg-[#d4af37] rotate-45"></div>
+                                        </div>
+                                        <div className="w-[80%] h-1 bg-[#d4af37] shadow-[0_0_15px_#d4af37] mt-3 relative z-10"></div>
+                                        
+                                        {/* 鳥居支撐柱 - 左柱 */}
+                                        <div className="absolute top-0 left-[10%] w-1 md:w-1.5 h-32 md:h-48 bg-gradient-to-b from-[#d4af37] to-transparent opacity-60 shadow-[0_0_15px_#d4af37] z-0"></div>
+                                        {/* 鳥居支撐柱 - 右柱 */}
+                                        <div className="absolute top-0 right-[10%] w-1 md:w-1.5 h-32 md:h-48 bg-gradient-to-b from-[#d4af37] to-transparent opacity-60 shadow-[0_0_15px_#d4af37] z-0"></div>
+                                    </div>
+                                    <div className="py-6 md:py-8 text-center relative z-[30]">
+                                        <div className="flex items-center justify-center gap-3 mb-4 md:mb-5">
+                                            <IconSettings className="animate-spin-slow text-[#d4af37] w-3 h-3 md:w-4 md:h-4" />
+                                            <div className="text-[12px] md:text-[14px] font-bold tracking-[1em] text-[#d4af37] uppercase opacity-80">PEPTIDE Technology</div>
+                                        </div>
+                                        <h1 className="text-4xl md:text-7xl font-black uppercase italic flex flex-col gap-0">
+                                            <span className="block tracking-tighter mb-1 md:mb-2">{i18n[lang].title}</span>
+                                            <span className="relative inline-block not-italic shiny-text leading-none">{i18n[lang].subtitle}</span>
+                                        </h1>
+                                    </div>
+                                    <button onClick={enterSystem} className="group relative px-12 md:px-24 py-6 md:py-7 overflow-hidden bg-[#d4af37]/5 border border-[#d4af37]/40 text-[#d4af37] font-bold text-[18px] md:text-[22px] tracking-[0.5em] transition-all hover:bg-[#d4af37] hover:text-black">
+                                        <span className="relative z-10 flex items-center gap-4">{i18n[lang].start} <IconChevronRight className="group-hover:translate-x-2 transition-transform w-4 h-4" /></span>
+                                        <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:left-[100%] transition-all duration-700" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {page === 'system' && (
+                        <div className={`relative z-10 transition-all duration-[1s] ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                            <header className="border-b border-[#d4af37]/20 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+                                <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+                                    <div className="breathing-text-container">
+                                        <div className="breathing-text" data-text={i18n[lang].status}>{i18n[lang].status}</div>
+                                    </div>
+                                    <LanguageSwitcher isFloating={false} />
+                                </div>
+                            </header>
+
+                            <main className="max-w-[1400px] mx-auto px-6 py-12 space-y-20">
+                                <section className="grid lg:grid-cols-2 gap-12 items-center">
+                                    <div className="space-y-8">
+                                        <div className="sync-tag-box inline-block"><span className="sync-tag-label">{i18n[lang].tag}</span></div>
+                                        <h2 className="text-6xl md:text-8xl font-black italic uppercase leading-none shiny-text" style={{ fontFamily: "'Noto Serif TC', serif" }}>{i18n[lang].hero}</h2>
+                                        <p className="text-[20px] md:text-[24px] opacity-90 leading-[1.7] max-w-2xl" style={{ fontFamily: "'Noto Serif TC', serif" }}>{i18n[lang].hero_desc}</p>
+                                        
+                                        <div className="space-y-4 pt-10 border-t border-[#d4af37]/20">
+                                            <div className="sync-tag-box inline-block"><span className="sync-tag-label" style={{ fontSize: '16px', letterSpacing: '0.2em' }}>{i18n[lang].stats_title}</span></div>
+                                            <div className="grid grid-cols-3 gap-4 max-w-md pt-4">
+                                                <div className="space-y-1 cursor-pointer hover:bg-white/5 p-2 rounded transition-colors" onClick={() => setRegionIdx((prev) => (prev + 1) % GLOBAL_STATS.length)}>
+                                                    <div className="text-[16px] text-[#d4af37] font-bold uppercase tracking-wider flex items-center whitespace-nowrap">{i18n[lang].region}</div>
+                                                    <div className="text-xl font-bold truncate text-white">{GLOBAL_STATS[regionIdx].name[lang]}</div>
+                                                </div>
+                                                <div className="space-y-1 border-l border-[#d4af37]/20 pl-4">
+                                                    <div className="text-[16px] text-[#d4af37] font-bold uppercase tracking-wider">{i18n[lang].release}</div>
+                                                    <div className="text-2xl font-black italic text-white"><RollingNumber key={`rel-${regionIdx}`} value={GLOBAL_STATS[regionIdx].release} /></div>
+                                                </div>
+                                                <div className="space-y-1 border-l border-[#d4af37]/20 pl-4">
+                                                    <div className="text-[16px] text-[#00d4ff] font-bold uppercase tracking-wider">{i18n[lang].remaining}</div>
+                                                    <div className="text-2xl font-black italic text-[#00d4ff] shadow-[0_0_10px_rgba(0,212,255,0.5)]"><RollingNumber key={`rem-${regionIdx}`} value={GLOBAL_STATS[regionIdx].remaining} /></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="relative aspect-video bg-black border border-[#d4af37]/30 cyber-border overflow-hidden"><AdvertisementWall /></div>
+                                </section>
+
+                                <section className="grid md:grid-cols-3 gap-6">
+                                    {cards_i18n[lang].map((item, i) => (
+                                        <div key={i} className="p-8 border border-[#d4af37]/40 bg-[#141410]/40 backdrop-blur-xl relative group hover:border-[#d4af37] hover:shadow-[0_0_25px_rgba(212,175,55,0.4)] transition-all duration-500 overflow-hidden">
+                                            {[IconSettings, IconZap, IconCpu][i] && React.createElement([IconSettings, IconZap, IconCpu][i], { className: "w-10 h-10 mb-6 text-[#d4af37] animate-spin-slow" })}
+                                            <h3 className="text-2xl md:text-3xl font-bold mb-2 text-white" style={{ fontFamily: "'Noto Serif TC', serif" }}>{item.title}</h3>
+                                            <div className="text-[#f5d76e] text-[20px] md:text-[24px] font-[900] tracking-widest mb-4 uppercase">{item.subtitle}</div>
+                                            <p className="text-[20px] md:text-[22px] opacity-80 leading-[1.6]" style={{ fontFamily: "'Noto Serif TC', serif" }}>{item.desc}</p>
+                                        </div>
+                                    ))}
+                                </section>
+
+                                <section className="pt-20 border-t border-[#d4af37]/10">
+                                    <div className="text-center mb-12"><h3 className="text-4xl md:text-5xl font-black uppercase italic" style={{ fontFamily: "'Noto Serif TC', serif" }}>{i18n[lang].explore_title}</h3></div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                                        {explore_i18n[lang].map((card, i) => (
+                                            <div key={i} className="cyber-card group" style={{ '--neon-color': card.color, '--neon-rgb': card.rgb }}>
+                                                <div className="p-8 flex flex-col h-full relative z-10">
+                                                    <div className="flex justify-between items-start mb-10"><div className="text-[12px] font-mono py-1 px-2 bg-white/5 text-white/40 border border-white/5">{card.code}</div><div className="status-light"></div></div>
+                                                    <h4 className="text-2xl md:text-3xl font-black mb-3 text-white" style={{ fontFamily: "'Noto Serif TC', serif" }}>{card.title}</h4>
+                                                    <div className="text-[20px] md:text-[24px] font-black tracking-widest mb-6 italic opacity-90" style={{ color: card.color, fontFamily: "'Orbitron', sans-serif" }}>{card.subtitle}</div>
+                                                    <p className="text-[20px] md:text-[22px] text-white/60 leading-[1.6] mb-12 min-h-[140px] whitespace-pre-line" style={{ fontFamily: "'Noto Serif TC', serif" }}>{card.desc}</p>
+                                                    <a href={card.url} target="_blank" rel="noopener noreferrer" className="mt-auto py-4 px-6 border border-[var(--neon-color)] text-[var(--neon-color)] font-bold tracking-widest uppercase hover:bg-[var(--neon-color)] hover:text-black transition-all text-center">
+                                                        {card.btn}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                <footer className="pt-32 pb-12 text-center space-y-12">
+                                    <div className="text-[#d4af37] text-3xl md:text-5xl font-black italic" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+                                        {i18n[lang].quote}
+                                    </div>
+                                    <div className="text-[14px] tracking-widest opacity-30 uppercase">
+                                        @ 2026 {i18n[lang].copyrightText}
+                                    </div>
+                                </footer>
+                            </main>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
