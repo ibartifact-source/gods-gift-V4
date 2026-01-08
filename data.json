@@ -1,0 +1,22 @@
+[
+  {
+    "name": { "zh": "台灣", "en": "Taiwan", "jp": "台湾" },
+    "release": 500,
+    "remaining": 42
+  },
+  {
+    "name": { "zh": "日本", "en": "Japan", "jp": "日本" },
+    "release": 800,
+    "remaining": 126
+  },
+  {
+    "name": { "zh": "美國", "en": "USA", "jp": "USA" },
+    "release": 1200,
+    "remaining": 345
+  },
+  {
+    "name": { "zh": "韓國", "en": "Korea", "jp": "韓国" },
+    "release": 600,
+    "remaining": 0
+  }
+]
