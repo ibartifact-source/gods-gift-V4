@@ -73,10 +73,10 @@
         const IconZap = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
         const IconGlobe = ({className}) => <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
 
-        // --- 支付組件 (封裝你的按鈕代碼) ---
+        // --- 支付組件 (已整合綠界連結) ---
         const PaymentSection = ({ lang }) => {
             const payConfig = {
-                zh: { stripe: '#d4af37', icon: '#00ff9f', title: '安全支付系統', desc: '由綠界科技提供第三方支付保障', btn: '前往安全支付', url: 'YOUR_ECPAY_URL' },
+                zh: { stripe: '#d4af37', icon: '#00ff9f', title: '安全支付系統', desc: '由綠界科技提供第三方支付保障', btn: '前往安全支付', url: 'https://form.cashier.ecpay.com.tw/cWgD/eyJVVUlEIjoiNjI2ZTUzYWItNWE3NS00NDYxLWI1MjktMTlkOTVlZjYzNzU0In0.oxrFfAaZeu6bocAghPuLr9WMwyE' },
                 en: { stripe: '#00d4ff', icon: '#00d4ff', title: 'Global Secure Payment', desc: 'Secured by PayPal Worldwide Service', btn: 'Checkout with PayPal', url: 'YOUR_PAYPAL_URL' },
                 jp: { stripe: '#d4af37', icon: '#00ff9f', title: '安全な支払いシステム', desc: 'ECPayによるサードパーティの支払い保護', btn: '安全な支払いへ', url: 'YOUR_ECPAY_URL' }
             };
@@ -116,7 +116,7 @@
             );
         };
 
-        // --- 靜態 i18n 配置 ---
+        // --- 其餘代碼保持不變 ---
         const i18n = {
             zh: { name: '繁體中文', title: '神的禮物', subtitle: '客製化機能飲料', start: '即將啟航', status: '覺醒 進化', tag: '獲取永續分散進步', hero: '極致核心能量', hero_desc: '透過精準的肽鏈技術，將大自然的神奇贈禮轉化為支撐夢想的純淨動能。', explore_title: '探索領域', region: '切換點選', release: '釋放名額', remaining: '剩餘名額', stats_title: '各國終身半價名額最新統計', quote: '「 每一場偉大，都始於一次次的覺醒進化。」', copyrightText: '神的禮物 版權所有' },
             en: { name: 'English', title: "God's Gift", subtitle: 'Customized Functional Drink', start: 'Launch Now', status: 'Awaken Evolution', tag: 'Sustained Progress', hero: 'Ultimate Core Energy', hero_desc: 'Transform nature\'s divine gifts into pure kinetic energy through precise peptide technology.', explore_title: 'Explore Realms', region: 'Switch Click', release: 'Release quota', remaining: 'Remaining', stats_title: 'Global Half-Price Quota Statistics', quote: '“Every greatness begins with continuous awakening and evolution.”', copyrightText: "God's Gift ALL RIGHTS RESERVED" },
@@ -193,10 +193,10 @@
                         setGlobalStats(data);
                     } catch (error) {
                         setGlobalStats([ 
-                            { name: { zh: '台灣', en: 'Taiwan', jp: '台湾' }, release: 500, remaining: 42 }, 
+                            { name: { zh: '台灣', en: 'Taiwan', jp: '台灣' }, release: 500, remaining: 42 }, 
                             { name: { zh: '日本', en: 'Japan', jp: '日本' }, release: 800, remaining: 126 }, 
                             { name: { zh: '美國', en: 'USA', jp: 'USA' }, release: 1200, remaining: 345 }, 
-                            { name: { zh: '韓國', en: 'Korea', jp: '韓国' }, release: 600, remaining: 0 } 
+                            { name: { zh: '韓國', en: 'Korea', jp: '韓國' }, release: 600, remaining: 0 } 
                         ]);
                     }
                 };
@@ -353,7 +353,7 @@
                                     </div>
                                 </section>
 
-                                {/* 支付區塊：放置於探索領域下方，格言上方 */}
+                                {/* 支付區塊：已整合中文連結 */}
                                 <PaymentSection lang={lang} />
 
                                 <footer className="pt-32 pb-12 text-center space-y-12">
